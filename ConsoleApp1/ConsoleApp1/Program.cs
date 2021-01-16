@@ -9,12 +9,12 @@ namespace ConsoleApp1
         Nadanie,
         Odbiór
     }
-    public enum Zakres
+   [Flags] public enum Zakres
     {
-        OC,
-        AC,
-        Dom,
-        Zycie
+        OC=0,
+        AC=1,
+        Dom=2,
+        Zycie=4
     }
     public enum TypSzkody
     {
@@ -32,8 +32,8 @@ namespace ConsoleApp1
         public static string Zad1(string litera)
         {
             DateTime localDate = DateTime.Now;
-            DateTime expireDate = localDate.AddDays(-30);
-            Random losuj = new Random();
+            DateTime expireDate = localDate.AddDays(+30);
+            Random losuj = new Random(DateTime.Now.Millisecond);
             int num = losuj.Next(0, 100);
             string etykieta = "Najlepiej spożyć przed: " + expireDate + " Numer Seryjny: " + litera + num + "";
             return etykieta;
@@ -50,7 +50,6 @@ namespace ConsoleApp1
                     paczkomat[i, j] = (Skrytka)(losuj.Next(0, 3));
                 }
             }
-
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 5; j++)
@@ -65,16 +64,24 @@ namespace ConsoleApp1
                     }
                 }
             }
-
         }
         //zad 2
         //Stwórz tablicę 10x5 reprezentującą paczkomat.Skrytki mogą mieć 3 stany: Pusta, Nadanie i Odbiór.Wypełnij tablicę losowymi wartościami.
         //Wypisz kurierowi do których skrytek może włożyć przesyłki do odbioru a także z których skrytek powinien odebrać nadane przesyłki.
         public class Polisa
         {
-            public Polisa(int numer, int dataPoczatkowa, int dataKoncowa, int kwota, Zakres zakres, TypSzkody typSzkody, int dataSzkody)
+            int numer;
+            int kwota { get; set; }
+            Zakres zakres;
+            TypSzkody typSzkody;
+            static DateTime dataPoczatkowa = DateTime.Now;
+            DateTime dataKoncowa = dataPoczatkowa.AddDays(+365);
+            DateTime dataSzkody = DateTime.Now;
+            int kwotaDoWyplacenia;
+
+            public Polisa(int numer, DateTime dataPoczatkowa, int kwota, Zakres zakres, TypSzkody typSzkody, DateTime dataSzkody)
             {
-                int kwotaDoWyplacenia;
+                
 
                 if (kwota < 0)
                 {
@@ -82,60 +89,59 @@ namespace ConsoleApp1
                 }
                 else
                 {
-                    Sprawdz(dataSzkody, typSzkody);
+                    Sprawdz(dataSzkody, typSzkody,kwota);
                 }
-                void Sprawdz(int dataSzkody, TypSzkody typSzkody)
+
+            }
+            void Sprawdz(DateTime dataSzkody, TypSzkody typSzkody, int kwota)
+            {
+                if (typSzkody == TypSzkody.Pojazd)
                 {
-                    if (typSzkody == TypSzkody.Pojazd)
+                    if (zakres == Zakres.OC)
                     {
-                        if (zakres == Zakres.OC)
-                        {
-                            kwotaDoWyplacenia = kwota / 10;
-                            Console.WriteLine("Polisa OC. Zwrot 10% kwoty " + kwotaDoWyplacenia);
-                        }
-                        if (zakres == Zakres.OC && zakres == Zakres.AC)
-                        {
-                            kwotaDoWyplacenia = kwota / 10 * 2;
-                            Console.WriteLine("Polisa OC+AC. Zwrot 20% kwoty " + kwotaDoWyplacenia);
-                        }
-                        }
-                        if (typSzkody == TypSzkody.Dom)
-                        {
-                            kwotaDoWyplacenia = kwota / 10 * 5;
-                            Console.WriteLine("Polisa Dom. Zwrot 50% kwoty " + kwotaDoWyplacenia);
-                        }
-                        if (typSzkody == TypSzkody.Szpital | typSzkody == TypSzkody.Choroba)
-                        {
-                            kwotaDoWyplacenia = kwota / 10 * 5;
-                            Console.WriteLine("Polisa Zycie. Zwrot 50% kwoty " + kwotaDoWyplacenia);
-                          }
+                        kwotaDoWyplacenia = kwota / 10;
+                        Console.WriteLine("Polisa OC. Zwrot 10% kwoty " + kwotaDoWyplacenia);
+                    }
+                    if (zakres == Zakres.OC && zakres == Zakres.AC)
+                    {
+                        kwotaDoWyplacenia = kwota / 10 * 2;
+                        Console.WriteLine("Polisa OC+AC. Zwrot 20% kwoty " + kwotaDoWyplacenia);
+                    }
+                }
+                if (typSzkody == TypSzkody.Dom)
+                {
+                    kwotaDoWyplacenia = kwota / 10 * 5;
+                    Console.WriteLine("Polisa Dom. Zwrot 50% kwoty " + kwotaDoWyplacenia);
+                }
+                if (typSzkody == TypSzkody.Szpital | typSzkody == TypSzkody.Choroba) // | oznacza OR i jest to celowe zastosowanie. Jeżeli typ szkody to Szpital lub Choroba wówczas jest to Polisa Życie i zwraca 50%
+                {
+                    kwotaDoWyplacenia = kwota / 10 * 5;
+                    Console.WriteLine("Polisa Zycie. Zwrot 50% kwoty " + kwotaDoWyplacenia);
                 }
             }
+         }
+
+            //zad3
+            //Stwórz klasę Polisa.Dodaj do niej właściwości Numer, Zakres(flaga bitowa), DataPoczatkowa, DataKoncowa i Kwota.
+            //Zakres powinien mieć opcje OC, AC, Dom, Zycie.Dodaj konstruktor, który wypełni wszystkie pola.Sprawdź czy kwota jest dodatnia - jeśli nie rzuć wyjątek. 
+            //Typ AC może być włączony tylko jeśli jest także OC. Data końcowa to zawsze 1 rok od daty początkowej.
+            //Dodaj metodę Sprawdz, która przyjmie następujące parametry: DataSzkody i TypSzkody a następnie zwróci kwotę ubezpieczenia do wypłaty.
+            // Jeśli typ szkody to słowo "Pojazd", to sprawdź czy polisa zakłada OC i AC. Jeśli tylko OC, zwróć 10 % Kwoty; jeśli OC i AC, zwróć 20 %.
+            //Jeśli typ do "Dom", zwróć 50 %.Jeśli typ to "Szpital" lub "Choroba", zwróć 50 %
             static void Main(string[] args)
             {
 
-                Console.WriteLine(Zad1("A"));
-                Zad2();
+             Console.WriteLine(Zad1("A")); 
+             Zad2();
+             DateTime dataPoczatkowa = DateTime.Now;
+            Polisa p1 = new Polisa(1, dataPoczatkowa, 350, Zakres.OC, TypSzkody.Pojazd, DateTime.Now);
+            Polisa p2 = new Polisa(2, dataPoczatkowa, -50, Zakres.AC, TypSzkody.Pojazd, DateTime.Now);
+            Polisa p3 = new Polisa(3, dataPoczatkowa, 1100, Zakres.Zycie, TypSzkody.Szpital, DateTime.Now);
+            Polisa p4 = new Polisa(4, dataPoczatkowa, 500, Zakres.Dom, TypSzkody.Dom, DateTime.Now);
+            Polisa p5 = new Polisa(5, dataPoczatkowa, 600, Zakres.AC, TypSzkody.Pojazd, DateTime.Now);
 
-                Polisa p1 = new Polisa(1, 2015, 2020, 350, Zakres.Zycie, TypSzkody.Szpital, 2016);
-                Polisa p2 = new Polisa(2, 2015, 2020, -50, Zakres.AC, TypSzkody.Pojazd, 2014);
-                Polisa p3 = new Polisa(3, 2015, 2020, 1100, Zakres.OC, TypSzkody.Pojazd, 2014);
-                Polisa p4 = new Polisa(4, 2015, 2020, 500, Zakres.Dom, TypSzkody.Dom, 2014);
-                Polisa p5 = new Polisa(5, 2015, 2020, 600, Zakres.AC, TypSzkody.Pojazd, 2014);
-                Console.WriteLine();
-
-                //zad3
-                //Stwórz klasę Polisa.Dodaj do niej właściwości Numer, Zakres(flaga bitowa), DataPoczatkowa, DataKoncowa i Kwota.
-                //Zakres powinien mieć opcje OC, AC, Dom, Zycie.Dodaj konstruktor, który wypełni wszystkie pola.Sprawdź czy kwota jest dodatnia - jeśli nie rzuć wyjątek. //komunikat cw //enum
-                //Typ AC może być włączony tylko jeśli jest także OC. Data końcowa to zawsze 1 rok od daty początkowej.
-                //Dodaj metodę Sprawdz, która przyjmie następujące parametry: DataSzkody i TypSzkody a następnie zwróci kwotę ubezpieczenia do wypłaty.
-                // Jeśli typ szkody to słowo "Pojazd", to sprawdź czy polisa zakłada OC i AC. Jeśli tylko OC, zwróć 10 % Kwoty; jeśli OC i AC, zwróć 20 %.
-                //Jeśli typ do "Dom", zwróć 50 %.Jeśli typ to "Szpital" lub "Choroba", zwróć 50 %
-
-
-
-            }
+        }
         }
     }
-}
+
 

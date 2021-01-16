@@ -9,12 +9,13 @@ namespace ConsoleApp1
         Nadanie,
         Odbiór
     }
-   [Flags] public enum Zakres
+    [Flags]
+    public enum Zakres
     {
-        OC=0,
-        AC=1,
-        Dom=2,
-        Zycie=4
+        OC = 1,
+        AC = 2,
+        Dom = 4,
+        Zycie = 8
     }
     public enum TypSzkody
     {
@@ -81,7 +82,7 @@ namespace ConsoleApp1
 
             public Polisa(int numer, DateTime dataPoczatkowa, int kwota, Zakres zakres, TypSzkody typSzkody, DateTime dataSzkody)
             {
-                
+
 
                 if (kwota < 0)
                 {
@@ -89,23 +90,23 @@ namespace ConsoleApp1
                 }
                 else
                 {
-                    Sprawdz(dataSzkody, typSzkody,kwota);
+                    Sprawdz(dataSzkody, typSzkody, kwota, zakres);
                 }
 
             }
-            void Sprawdz(DateTime dataSzkody, TypSzkody typSzkody, int kwota)
+            void Sprawdz(DateTime dataSzkody, TypSzkody typSzkody, int kwota,Zakres zakres)
             {
                 if (typSzkody == TypSzkody.Pojazd)
                 {
+                    if (zakres == Zakres.AC)
+                    {
+                        kwotaDoWyplacenia = kwota / 10 * 2;
+                        Console.WriteLine("Polisa OC+AC. Zwrot 20% kwoty " + kwotaDoWyplacenia);
+                    }
                     if (zakres == Zakres.OC)
                     {
                         kwotaDoWyplacenia = kwota / 10;
                         Console.WriteLine("Polisa OC. Zwrot 10% kwoty " + kwotaDoWyplacenia);
-                    }
-                    if (zakres == Zakres.OC && zakres == Zakres.AC)
-                    {
-                        kwotaDoWyplacenia = kwota / 10 * 2;
-                        Console.WriteLine("Polisa OC+AC. Zwrot 20% kwoty " + kwotaDoWyplacenia);
                     }
                 }
                 if (typSzkody == TypSzkody.Dom)
@@ -113,35 +114,34 @@ namespace ConsoleApp1
                     kwotaDoWyplacenia = kwota / 10 * 5;
                     Console.WriteLine("Polisa Dom. Zwrot 50% kwoty " + kwotaDoWyplacenia);
                 }
-                if (typSzkody == TypSzkody.Szpital | typSzkody == TypSzkody.Choroba) // | oznacza OR i jest to celowe zastosowanie. Jeżeli typ szkody to Szpital lub Choroba wówczas jest to Polisa Życie i zwraca 50%
+                if (typSzkody == TypSzkody.Szpital || typSzkody == TypSzkody.Choroba) 
                 {
                     kwotaDoWyplacenia = kwota / 10 * 5;
                     Console.WriteLine("Polisa Zycie. Zwrot 50% kwoty " + kwotaDoWyplacenia);
                 }
             }
-         }
-
-            //zad3
-            //Stwórz klasę Polisa.Dodaj do niej właściwości Numer, Zakres(flaga bitowa), DataPoczatkowa, DataKoncowa i Kwota.
-            //Zakres powinien mieć opcje OC, AC, Dom, Zycie.Dodaj konstruktor, który wypełni wszystkie pola.Sprawdź czy kwota jest dodatnia - jeśli nie rzuć wyjątek. 
-            //Typ AC może być włączony tylko jeśli jest także OC. Data końcowa to zawsze 1 rok od daty początkowej.
-            //Dodaj metodę Sprawdz, która przyjmie następujące parametry: DataSzkody i TypSzkody a następnie zwróci kwotę ubezpieczenia do wypłaty.
-            // Jeśli typ szkody to słowo "Pojazd", to sprawdź czy polisa zakłada OC i AC. Jeśli tylko OC, zwróć 10 % Kwoty; jeśli OC i AC, zwróć 20 %.
-            //Jeśli typ do "Dom", zwróć 50 %.Jeśli typ to "Szpital" lub "Choroba", zwróć 50 %
-            static void Main(string[] args)
-            {
-
-             Console.WriteLine(Zad1("A")); 
-             Zad2();
-             DateTime dataPoczatkowa = DateTime.Now;
-            Polisa p1 = new Polisa(1, dataPoczatkowa, 350, Zakres.OC, TypSzkody.Pojazd, DateTime.Now);
-            Polisa p2 = new Polisa(2, dataPoczatkowa, -50, Zakres.AC, TypSzkody.Pojazd, DateTime.Now);
-            Polisa p3 = new Polisa(3, dataPoczatkowa, 1100, Zakres.Zycie, TypSzkody.Szpital, DateTime.Now);
-            Polisa p4 = new Polisa(4, dataPoczatkowa, 500, Zakres.Dom, TypSzkody.Dom, DateTime.Now);
-            Polisa p5 = new Polisa(5, dataPoczatkowa, 600, Zakres.AC, TypSzkody.Pojazd, DateTime.Now);
-
         }
+        //zad3
+        //Stwórz klasę Polisa.Dodaj do niej właściwości Numer, Zakres(flaga bitowa), DataPoczatkowa, DataKoncowa i Kwota.
+        //Zakres powinien mieć opcje OC, AC, Dom, Zycie.Dodaj konstruktor, który wypełni wszystkie pola.Sprawdź czy kwota jest dodatnia - jeśli nie rzuć wyjątek. 
+        //Typ AC może być włączony tylko jeśli jest także OC. Data końcowa to zawsze 1 rok od daty początkowej.
+        //Dodaj metodę Sprawdz, która przyjmie następujące parametry: DataSzkody i TypSzkody a następnie zwróci kwotę ubezpieczenia do wypłaty.
+        // Jeśli typ szkody to słowo "Pojazd", to sprawdź czy polisa zakłada OC i AC. Jeśli tylko OC, zwróć 10 % Kwoty; jeśli OC i AC, zwróć 20 %.
+        //Jeśli typ do "Dom", zwróć 50 %.Jeśli typ to "Szpital" lub "Choroba", zwróć 50 %
+        static void Main(string[] args)
+        {
+
+            Console.WriteLine(Zad1("A"));
+            Zad2();
+            DateTime dataPoczatkowa = DateTime.Now;
+            Polisa p1 = new Polisa(1, dataPoczatkowa, 500, Zakres.OC , TypSzkody.Pojazd, DateTime.Now);
+            Polisa p2 = new Polisa(2, dataPoczatkowa, 500, Zakres.AC, TypSzkody.Pojazd, DateTime.Now);
+            Polisa p3 = new Polisa(3, dataPoczatkowa, 1100, Zakres.Zycie, TypSzkody.Szpital, DateTime.Now); 
+            Polisa p4 = new Polisa(4, dataPoczatkowa, 500, Zakres.Dom, TypSzkody.Dom, DateTime.Now); 
+            Polisa p5 = new Polisa(5, dataPoczatkowa, 600, Zakres.Dom, TypSzkody.Szpital, DateTime.Now);
         }
+
     }
+}
 
 

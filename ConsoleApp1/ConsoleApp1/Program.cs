@@ -98,14 +98,14 @@ namespace ConsoleApp1
             {
                 if (typSzkody == TypSzkody.Pojazd)
                 {
-                    if (zakres == Zakres.AC | zakres==Zakres.OC)
-                    {
-                        kwotaDoWyplacenia = kwota / 10 * 2;
-                        Console.WriteLine("Polisa OC+AC. Zwrot 20% kwoty " + kwotaDoWyplacenia);
-                    }else if(zakres == Zakres.OC)
+                    if (zakres == Zakres.OC)
                     {
                         kwotaDoWyplacenia = kwota / 10;
                         Console.WriteLine("Polisa OC. Zwrot 10% kwoty " + kwotaDoWyplacenia);
+                    }else if (zakres == Zakres.AC | zakres==Zakres.OC)
+                    {
+                        kwotaDoWyplacenia = kwota / 10 * 2;
+                        Console.WriteLine("Polisa OC+AC. Zwrot 20% kwoty " + kwotaDoWyplacenia);
                     }
                 }
                 if (typSzkody == TypSzkody.Dom)
@@ -133,7 +133,7 @@ namespace ConsoleApp1
           //  Console.WriteLine(Zad1("A"));
            // Zad2();
             DateTime dataPoczatkowa = DateTime.Now;
-            Polisa p1 = new Polisa(1, dataPoczatkowa, 500, Zakres.OC , TypSzkody.Pojazd, DateTime.Now);
+            Polisa p1 = new Polisa(1, dataPoczatkowa, 50, Zakres.OC , TypSzkody.Pojazd, DateTime.Now);
             Polisa p2 = new Polisa(2, dataPoczatkowa, 500, Zakres.AC, TypSzkody.Pojazd, DateTime.Now);
             Polisa p3 = new Polisa(3, dataPoczatkowa, 1100, Zakres.Zycie, TypSzkody.Szpital, DateTime.Now); 
             Polisa p4 = new Polisa(4, dataPoczatkowa, 500, Zakres.Dom, TypSzkody.Dom, DateTime.Now); 
